@@ -1,0 +1,22 @@
+version: "3.11"
+
+services:
+  db:
+    image: postgres:14.4-alpine
+    environment:
+      - POSTGRES_DB=bookmine
+      - POSTGRES_USER=bookmineuser
+      - POSTGRES_PASSWORD=My@NewPassword12345
+  web:
+    build: .
+    command: ./docker-entrypoint.sh
+    volumes: 
+      - .:/app
+    ports:
+      - 8000:8000
+    environment:
+      - POSTGRES_DB=bookmine
+      - POSTGRES_USER=bookmineuser
+      - POSTGRES_PASSWORD=My@NewPassword12345
+    depends_on:
+      - db
