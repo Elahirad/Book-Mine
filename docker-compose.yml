@@ -18,3 +18,15 @@ services:
       - POSTGRES_DB=bookmine
       - POSTGRES_USER=bookmineuser
       - POSTGRES_PASSWORD=My@NewPassword12345
+  test:
+    build: .
+    command: ./wait-for-it.sh db:5432 -- ptw
+    depends_on:
+      - db
+    tty: true
+    volumes:
+      - .:/app
+    environment:
+      - POSTGRES_DB=bookmine
+      - POSTGRES_USER=bookmineuser
+      - POSTGRES_PASSWORD=My@NewPassword12345

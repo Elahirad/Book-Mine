@@ -7,6 +7,9 @@ name = "pypi"
 django = "*"
 djangorestframework = "*"
 psycopg2 = "*"
+pytest = "*"
+pytest-django = "*"
+pytest-watch = "*"
 
 [dev-packages]
 autopep8 = "*"
