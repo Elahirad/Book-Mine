@@ -9,7 +9,7 @@ services:
       - POSTGRES_PASSWORD=My@NewPassword12345
   web:
     build: .
-    command: ./docker-entrypoint.sh
+    command: ./wait-for-it.sh db:5432 -- ./docker-entrypoint.sh
     volumes: 
       - .:/app
     ports:
@@ -18,5 +18,3 @@ services:
       - POSTGRES_DB=bookmine
       - POSTGRES_USER=bookmineuser
       - POSTGRES_PASSWORD=My@NewPassword12345
-    depends_on:
-      - db
