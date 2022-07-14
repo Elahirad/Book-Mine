@@ -10,6 +10,7 @@ psycopg2 = "*"
 pytest = "*"
 pytest-django = "*"
 pytest-watch = "*"
+drf-nested-routers = "*"
 
 [dev-packages]
 autopep8 = "*"

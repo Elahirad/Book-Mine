@@ -11,11 +11,25 @@ class Customer(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
 
+class Category(models.Model):
+    title = models.CharField(max_length=255)
+    added_at = models.DateField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return self.title
+
+
 class Product(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     unit_price = models.DecimalField(max_digits=6, decimal_places=2)
     added_at = models.DateField(auto_now_add=True)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+
+
+class ProductFile(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='files')
+    file = models.FileField(upload_to='store/products/files')
 
 
 class Order(models.Model):
