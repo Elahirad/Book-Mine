@@ -1,26 +1,27 @@
 from django.shortcuts import get_object_or_404
-from rest_framework.response import Response
-from rest_framework.decorators import api_view
-from rest_framework.views import APIView
-from rest_framework import mixins
 from rest_framework import viewsets
+from rest_framework import permissions
 from store.models import Category, Product, ProductFile
+from store.permissions import IsAdminOrReadOnly
 from store.serializers import CategorySerializer, ProductFileSerializer, ProductSerializer
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    permission_classes = [IsAdminOrReadOnly]
 
 
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    permission_classes = [IsAdminOrReadOnly]
 
 
 class ProductFileViewSet(viewsets.ModelViewSet):
     queryset = ProductFile.objects.all()
     serializer_class = ProductFileSerializer
+    permission_classes = [IsAdminOrReadOnly]
 
     def create(self, request, *args, **kwargs):
         product_existance_check(self)
