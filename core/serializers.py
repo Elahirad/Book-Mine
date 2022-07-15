@@ -11,7 +11,9 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class CreateUserSerializer(serializers.ModelSerializer):
-    
+
+    id = serializers.IntegerField(read_only=True)
+
     def save(self, **kwargs):
         self.validated_data['password'] = make_password(
             self.validated_data['password'])
@@ -19,7 +21,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['username', 'password', 'first_name',
+        fields = ['id', 'username', 'password', 'first_name',
                   'last_name', 'email']
 
 
