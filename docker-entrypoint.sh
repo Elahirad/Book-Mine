@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo "Installing new dependecies ..."
+pipenv install
+
 echo "Applying db migrations ..."
 python manage.py migrate
 
