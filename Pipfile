@@ -12,6 +12,7 @@ pytest-django = "*"
 pytest-watch = "*"
 drf-nested-routers = "*"
 djangorestframework-simplejwt = "*"
+model-bakery = "*"
 
 [dev-packages]
 autopep8 = "*"
