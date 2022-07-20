@@ -1,9 +1,20 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework import permissions
-from store.models import Category, Product, ProductFile
+from store.models import Category, Customer, Product, ProductFile
 from store.permissions import IsAdminOrReadOnly
-from store.serializers import CategorySerializer, ProductFileSerializer, ProductSerializer
+from store.serializers import CategorySerializer, CustomerSerializer, ProductFileSerializer, ProductSerializer
+
+
+class CustomerViewSet(viewsets.ModelViewSet):
+    serializer_class = CustomerSerializer
+
+    permission_classes = [IsAdminOrReadOnly]
+
+    def get_queryset(self):
+        if self.request.user.is_staff:
+            return Customer.objects.all()
+        return Customer.objects.filter(user_id=self.request.user.id)
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
