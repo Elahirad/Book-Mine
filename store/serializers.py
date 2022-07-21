@@ -2,6 +2,12 @@ from rest_framework.serializers import ModelSerializer, SerializerMethodField
 from store.models import Category, Customer, Product, ProductFile
 
 
+class UpdateCustomerSerializer(ModelSerializer):
+    class Meta:
+        model = Customer
+        fields = ['phone']
+
+
 class CustomerSerializer(ModelSerializer):
     username = SerializerMethodField('get_username')
     first_name = SerializerMethodField('get_first_name')

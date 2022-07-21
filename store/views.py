@@ -3,13 +3,22 @@ from rest_framework import viewsets
 from rest_framework import permissions
 from store.models import Category, Customer, Product, ProductFile
 from store.permissions import IsAdminOrReadOnly
-from store.serializers import CategorySerializer, CustomerSerializer, ProductFileSerializer, ProductSerializer
+from store.serializers import CategorySerializer, CustomerSerializer, ProductFileSerializer, ProductSerializer, UpdateCustomerSerializer
 
 
 class CustomerViewSet(viewsets.ModelViewSet):
+    http_method_names = ['get', 'patch', 'options', 'head']
     serializer_class = CustomerSerializer
 
-    permission_classes = [IsAdminOrReadOnly]
+    def get_permissions(self):
+        if self.request.method in permissions.SAFE_METHODS:
+            return [permissions.IsAuthenticated()]
+        return [permissions.IsAdminUser()]
+
+    def get_serializer_class(self):
+        if self.request.method == 'patch':
+            return UpdateCustomerSerializer
+        return CustomerSerializer
 
     def get_queryset(self):
         if self.request.user.is_staff:
