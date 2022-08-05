@@ -7,13 +7,19 @@ class Customer(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
+    def __str__(self) -> str:
+        return str(self.user)
+
 
 class Category(models.Model):
+    class Meta:
+        verbose_name_plural = 'categories'
+
     title = models.CharField(max_length=255)
     added_at = models.DateField(auto_now_add=True)
 
     def __str__(self) -> str:
-        return self.title
+        return str(self.title)
 
 
 class Product(models.Model):
@@ -22,6 +28,9 @@ class Product(models.Model):
     unit_price = models.DecimalField(max_digits=6, decimal_places=2)
     added_at = models.DateField(auto_now_add=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
+
+    def __str__(self) -> str:
+        return str(self.title)
 
 
 class ProductFile(models.Model):
