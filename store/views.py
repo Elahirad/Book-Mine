@@ -1,3 +1,4 @@
+from uuid import uuid4
 from django.shortcuts import get_object_or_404
 from django.http import FileResponse
 from rest_framework import viewsets
@@ -83,10 +84,9 @@ class ProductFileViewSet(
                 response = FileResponse(
                     file_handle, content_type='application/pdf')
                 response['Content-Length'] = instance.file.size
-                response['Content-Disposition'] = 'attachment; filename="%s"' % instance.file.name
+                response['Content-Disposition'] = f'attachment; filename="{uuid4()}.pdf"'
                 return response
-        
-        
+
         return Response(
             {
                 'message': "You don't have this product in your owned products."
