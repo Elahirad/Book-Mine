@@ -1,5 +1,6 @@
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
 from store.models import Category, Customer, Product, ProductFile
+import os
 
 
 class UpdateCustomerSerializer(ModelSerializer):
@@ -46,11 +47,24 @@ class ProductSerializer(ModelSerializer):
 
 class ProductFileSerializer(ModelSerializer):
 
+    filename = SerializerMethodField('get_filename')
+
+    url = SerializerMethodField('get_url')
+
     def save(self, **kwargs):
         prodcut_id = self.context['product_id']
         ProductFile.objects.create(
             product_id=prodcut_id, **self.validated_data)
 
+    def get_filename(self, productfile):
+        return os.path.basename(productfile.file.name)
+
+    def get_url(self, productfile):
+        request = self.context['request']
+        return request.build_absolute_uri(
+            f'/store/products/{productfile.product.id}/files/{productfile.id}/'
+        )
+
     class Meta:
         model = ProductFile
-        fields = ['id', 'file']
+        fields = ['id', 'filename', 'url']

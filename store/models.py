@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from .validators import validate_file_type
 
 
 class Customer(models.Model):
@@ -34,8 +35,12 @@ class Product(models.Model):
 
 
 class ProductFile(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='files')
-    file = models.FileField(upload_to='store/products/files')
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, related_name='files')
+    file = models.FileField(
+        upload_to='store/products/files',
+        validators=[validate_file_type]
+    )
 
 
 class Order(models.Model):
@@ -48,11 +53,13 @@ class Order(models.Model):
         (CANCELED_ORDER, 'Canceled')
     ]
     placed_at = models.DateTimeField(auto_now_add=True)
-    customer = models.ForeignKey(Customer, on_delete=models.PROTECT)
+    customer = models.ForeignKey(
+        Customer, on_delete=models.PROTECT, related_name='orders')
     order_status = models.CharField(max_length=1, choices=ORDER_STATUS_CHOICES)
 
 
 class OrderItem(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    order = models.ForeignKey(
+        Order, on_delete=models.CASCADE, related_name='items')
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
     quantity = models.IntegerField()

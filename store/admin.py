@@ -65,5 +65,6 @@ class OrderItemInline(admin.StackedInline):
 @admin.register(models.Order)
 class OrderAdmin(ModelAdmin):
     fields = ['customer', 'placed_at', 'order_status']
+    readonly_fields = ['placed_at']
     inlines = [OrderItemInline]
-    list_display = ['customer', 'order_status']
+    list_display = ['id', 'customer', 'order_status']

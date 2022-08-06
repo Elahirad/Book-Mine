@@ -1,7 +1,11 @@
 from django.shortcuts import get_object_or_404
+from django.http import FileResponse
 from rest_framework import viewsets
 from rest_framework import permissions
-from store.models import Category, Customer, Product, ProductFile
+from rest_framework import mixins
+from rest_framework.response import Response
+from rest_framework import status
+from store.models import Category, Customer, Order, Product, ProductFile
 from store.permissions import IsAdminOrReadOnly
 from store.serializers import CategorySerializer, CustomerSerializer, ProductFileSerializer, ProductSerializer, UpdateCustomerSerializer
 
@@ -38,37 +42,62 @@ class ProductViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminOrReadOnly]
 
 
-class ProductFileViewSet(viewsets.ModelViewSet):
-    queryset = ProductFile.objects.all()
+class ProductFileViewSet(
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    viewsets.GenericViewSet
+):
+
+    http_method_names = ['get']
     serializer_class = ProductFileSerializer
-    permission_classes = [IsAdminOrReadOnly]
 
-    def create(self, request, *args, **kwargs):
-        product_existance_check(self)
-        return super().create(request, *args, **kwargs)
-
-    def update(self, request, *args, **kwargs):
-        product_existance_check(self)
-        return super().update(request, *args, **kwargs)
-
-    def destroy(self, request, *args, **kwargs):
-        product_existance_check(self)
-        return super().destroy(request, *args, **kwargs)
-
-    def get_object(self):
-        product_existance_check(self)
-        return super().get_object()
+    def get_serializer_context(self):
+        return {'request': self.request}
 
     def get_queryset(self):
-        product_existance_check(self)
         product_id = self.kwargs['product_pk']
         return ProductFile.objects.filter(product_id=product_id)
 
-    def get_serializer_context(self):
-        product_id = self.kwargs['product_pk']
-        return {'product_id': product_id}
+    def list(self, request, *args, **kwargs):
+        (orders, product_id) = prepere_files(self)
+
+        for order in orders:
+            if order.items.filter(product_id=product_id).count() > 0:
+                return super().list(request)
+
+        return Response(
+            {
+                'message': "You don't have this product in your owned products."
+            },
+            status=status.HTTP_403_FORBIDDEN
+        )
+
+    def retrieve(self, request, *args, **kwargs):
+        (orders, product_id) = prepere_files(self)
+
+        for order in orders:
+            if order.items.filter(product_id=product_id).count() > 0:
+                instance = self.get_object()
+                file_handle = instance.file.open()
+
+                response = FileResponse(
+                    file_handle, content_type='application/pdf')
+                response['Content-Length'] = instance.file.size
+                response['Content-Disposition'] = 'attachment; filename="%s"' % instance.file.name
+                return response
+        
+        
+        return Response(
+            {
+                'message': "You don't have this product in your owned products."
+            },
+            status=status.HTTP_403_FORBIDDEN
+        )
 
 
-def product_existance_check(self):
+def prepere_files(self):
     product_id = self.kwargs['product_pk']
     get_object_or_404(Product, pk=product_id)
+    user = self.request.user
+    customer = Customer.objects.get(user=user)
+    return (Order.objects.filter(customer_id=customer.id, order_status='C'), product_id)
